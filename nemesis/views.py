@@ -23,7 +23,7 @@ class RegView(APIView):
             player.save()
             return Response("reg")
         else:
-            return Response(form.errors)
+            return Response("reg errors")
 
 
 class LoginView(APIView):
@@ -38,14 +38,14 @@ class LoginView(APIView):
             login(request, user)
             return Response("logged")
         else:
-            return Response(request.POST)
+            return Response("not logged")
 
 
 def user_logout(request):
     logout(request)
     return redirect("/test")
 
-@api_view(["POST"])
-def get_user_data(request):
-    user = User.objects.get(username=request.POST.get('username'))
-    return Response(Player.objects.get(user=user).desc)
+@api_view(["GET"])
+def get_user_data(request, username):
+    user = User.objects.get(username=username)
+    return Response(Player.objects.get(user=user).avatar)
