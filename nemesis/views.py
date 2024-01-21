@@ -10,8 +10,8 @@ from rest_framework.views import APIView
 from django.shortcuts import render, redirect
 from .forms import UserForm
 from django.contrib.auth.models import User
-from .models import Player
-from .serializers import UserSerializer, LoginRequestSerializer, TokenSerializer
+from .models import Player, Session
+from .serializers import UserSerializer, LoginRequestSerializer, TokenSerializer, PlayerSerializer, SessionSerializer
 from rest_framework.authtoken.models import Token
 
 
@@ -64,3 +64,19 @@ def get_user_data(request, username):
 @authentication_classes([TokenAuthentication])
 def get_user(request):
     return Response({'data': UserSerializer(request.user).data})
+
+@api_view()
+def get_player_data(request, username):
+    user = User.objects.get(username=username)
+    player = Player.objects.get(user=user)
+    return Response(PlayerSerializer(player).data)
+
+@api_view()
+def get_sessions(request, username):
+    sessions1 = Session.objects.filter(player1=username)
+    sessions2 = Session.objects.filter(player2=username)
+    sessions3 = Session.objects.filter(player3=username)
+    sessions4 = Session.objects.filter(player4=username)
+    sessions = sessions1.union(sessions2, sessions3, sessions4).order_by('-date')
+    serializer = SessionSerializer(sessions, many=True)
+    return Response(serializer.data)

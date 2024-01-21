@@ -3,6 +3,7 @@ import random
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class TestObject(models.Model):
@@ -15,6 +16,8 @@ class TestObject(models.Model):
 class Player(models.Model):
     user = models.OneToOneField(User, null=False, on_delete=models.CASCADE)
     desc = models.IntegerField(default=0)
+    last_online = models.DateTimeField(default=timezone.now())
+    in_game_time = models.IntegerField(default=0)
     avatar = models.CharField(max_length=100)
 
     def init(self):
@@ -28,3 +31,13 @@ class Player(models.Model):
         else:
             self.avatar = "https://drive.google.com/uc?export=view&id=1NLPv8nQIAvOBF5dD6yrshtYcMMBotSlt"
         self.save()
+
+class Session(models.Model):
+    name = models.CharField(max_length=50, default='session_name')
+    date = models.DateTimeField(default=timezone.now())
+    result = models.CharField(max_length=20)
+    length = models.IntegerField(default=0)
+    player1 = models.CharField(max_length=20, default='')
+    player2 = models.CharField(max_length=20, default='')
+    player3 = models.CharField(max_length=20, default='')
+    player4 = models.CharField(max_length=20, default='')
