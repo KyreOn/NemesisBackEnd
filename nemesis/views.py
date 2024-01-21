@@ -60,6 +60,7 @@ def get_user_data(request, username):
 
 
 @api_view()
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
 def get_user(request):
-    if request.user.is_authenticated:
-        return Response({'data': UserSerializer(request.user).data})
+    return Response({'data': UserSerializer(request.user).data})
