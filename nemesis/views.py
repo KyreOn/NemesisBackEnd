@@ -90,6 +90,15 @@ def get_sessions(request, username):
     serializer = SessionSerializer(sessions, many=True)
     return Response(serializer.data)
 
+@api_view()
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def check_profile(request, user_profile):
+    user = request.user
+    if (user.username == user_profile):
+        return Response(status=200)
+    return Response(status=500)
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
@@ -98,3 +107,12 @@ def update_name(request):
     user.username = request.data['username']
     user.save()
     return Response(user.username)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def update_avatar(request):
+    player = Player.objects.get(user=request.user)
+    player.avatarImage = request.data
+    return Response(request.data)
+
