@@ -89,3 +89,12 @@ def get_sessions(request, username):
     sessions = sessions1.union(sessions2, sessions3, sessions4).order_by('-date')
     serializer = SessionSerializer(sessions, many=True)
     return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def update_name(request):
+    user = request.user
+    user.username = request.data['username']
+    user.save()
+    return Response(user.username)

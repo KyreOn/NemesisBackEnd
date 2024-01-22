@@ -19,6 +19,7 @@ class Player(models.Model):
     last_online = models.DateTimeField(auto_now_add=True)
     in_game_time = models.IntegerField(default=0)
     avatar = models.CharField(max_length=100)
+    avatarImage = models.ImageField(null=True)
 
     def init(self):
         id = random.randint(0, 3)

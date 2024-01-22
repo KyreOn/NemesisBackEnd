@@ -11,4 +11,5 @@ urlpatterns = [
     path('get_user', views.get_user),
     path('login', views.login, name='login'),
     path('get_sessions/<str:username>', views.get_sessions),
+    path('update_name', views.update_name),
 ]
