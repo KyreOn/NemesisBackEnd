@@ -15,8 +15,8 @@ class TestObject(models.Model):
 
 class Player(models.Model):
     user = models.OneToOneField(User, null=False, on_delete=models.CASCADE)
-    desc = models.IntegerField(default=0)
-    last_online = models.DateTimeField(default=timezone.now())
+    gameCount = models.IntegerField(default=0)
+    last_online = models.DateTimeField(auto_now_add=True)
     in_game_time = models.IntegerField(default=0)
     avatar = models.CharField(max_length=100)
 
@@ -34,8 +34,8 @@ class Player(models.Model):
 
 class Session(models.Model):
     name = models.CharField(max_length=50, default='session_name')
-    date = models.DateTimeField(default=timezone.now())
-    result = models.CharField(max_length=20)
+    date = models.DateTimeField(auto_now_add=True)
+    result = models.IntegerField(default=0)
     length = models.IntegerField(default=0)
     player1 = models.CharField(max_length=20, default='')
     player2 = models.CharField(max_length=20, default='')

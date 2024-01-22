@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect
 from .forms import UserForm
 from django.contrib.auth.models import User
 from .models import Player, Session
-from .serializers import UserSerializer, LoginRequestSerializer, TokenSerializer, PlayerSerializer, SessionSerializer
+from .serializers import UserSerializer, RegRequestSerializer, LoginRequestSerializer, TokenSerializer, PlayerSerializer, SessionSerializer
 from rest_framework.authtoken.models import Token
 
 
@@ -21,16 +21,24 @@ class RegView(APIView):
         return render(request, 'reg.html', {'form': form})
 
     def post(self, request):
-        form = UserForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            player = Player(user=user)
-            player.init()
-            player.save()
-            return Response("reg")
+        serializer = RegRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.data['username']
+            password = serializer.data['password']
+
+            confirm = serializer.data['confirm']
+            if password == confirm:
+                user = User.objects.create_user(username=username, password=password)
+                user.save()
+                player = Player(user=user)
+                player.init()
+                token = Token.objects.create(user=user)
+                player.save()
+                return Response(TokenSerializer(token).data)
+            else:
+                return Response('Пароли разные', status=500)
         else:
-            return Response("reg errors")
+            return Response('Ошибка в данных', status=500)
 
 
 class LoginView(APIView):
@@ -63,7 +71,8 @@ def get_user_data(request, username):
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def get_user(request):
-    return Response({'data': UserSerializer(request.user).data})
+    player = Player.objects.get(user=request.user)
+    return Response({'data': PlayerSerializer(player).data})
 
 @api_view()
 def get_player_data(request, username):

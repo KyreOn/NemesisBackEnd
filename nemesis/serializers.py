@@ -10,6 +10,12 @@ class UserSerializer(ModelSerializer):
         fields = ['username', 'first_name', 'last_name', 'email', 'date_joined']
 
 
+class RegRequestSerializer(Serializer):
+    model = User
+    username = CharField(required=True)
+    password = CharField(required=True)
+    confirm = CharField(required=True)
+
 class LoginRequestSerializer(Serializer):
     model = User
     username = CharField(required=True)
