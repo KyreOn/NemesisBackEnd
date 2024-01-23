@@ -57,10 +57,6 @@ class LoginView(APIView):
             return Response(serializer.errors, status=400)
 
 
-def user_logout(request):
-    logout(request)
-    return redirect("/test")
-
 @api_view(["GET"])
 def get_user_data(request, username):
     user = User.objects.get(username=username)
@@ -73,31 +69,6 @@ def get_user_data(request, username):
 def get_user(request):
     player = Player.objects.get(user=request.user)
     return Response({'data': PlayerSerializer(player).data})
-
-@api_view()
-def get_player_data(request, username):
-    user = User.objects.get(username=username)
-    player = Player.objects.get(user=user)
-    return Response(PlayerSerializer(player).data)
-
-@api_view()
-def get_sessions(request, username):
-    sessions1 = Session.objects.filter(player1=username)
-    sessions2 = Session.objects.filter(player2=username)
-    sessions3 = Session.objects.filter(player3=username)
-    sessions4 = Session.objects.filter(player4=username)
-    sessions = sessions1.union(sessions2, sessions3, sessions4).order_by('-date')
-    serializer = SessionSerializer(sessions, many=True)
-    return Response(serializer.data)
-
-@api_view()
-@permission_classes([IsAuthenticated])
-@authentication_classes([TokenAuthentication])
-def check_profile(request, user_profile):
-    user = request.user
-    if (user.username == user_profile):
-        return Response(status=200)
-    return Response(status=500)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -116,3 +87,39 @@ def update_avatar(request):
     player.avatarImage = request.data
     return Response(request.data)
 
+@api_view()
+def get_user_id(request):
+    player = Player.objects.get(id=2)
+    return Response(player.avatar)
+
+
+@api_view()
+def get_users(reqest, username):
+    players = Player.objects.filter(user__username__contains=username)
+    return Response(PlayerSerializer(players, many=True).data)
+
+
+@api_view()
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def check_profile(request, id):
+    player = Player.objects.get(user=request.user)
+    if player.id == id:
+        return Response(status=200)
+    return Response(status=500)
+
+@api_view()
+def get_player_data(request, id):
+    player = Player.objects.get(id=id)
+    return Response(PlayerSerializer(player).data)
+
+
+@api_view()
+def get_sessions(request, id):
+    sessions1 = Session.objects.filter(player1=id)
+    sessions2 = Session.objects.filter(player2=id)
+    sessions3 = Session.objects.filter(player3=id)
+    sessions4 = Session.objects.filter(player4=id)
+    sessions = sessions1.union(sessions2, sessions3, sessions4).order_by('-date')
+    serializer = SessionSerializer(sessions, many=True)
+    return Response(serializer.data)
