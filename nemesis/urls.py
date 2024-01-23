@@ -13,5 +13,7 @@ urlpatterns = [
     path('update_name', views.update_name),
     path('update_avatar', views.update_avatar),
     path('get_user_id', views.get_user_id),
-    path('get_users/<str:username>', views.get_users )
+    path('get_users/<str:username>', views.get_users ),
+    path('get_id/<str:username>', views.get_id),
+    path('send_result', views.send_session)
 ]

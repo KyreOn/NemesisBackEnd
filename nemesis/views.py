@@ -25,7 +25,6 @@ class RegView(APIView):
         if serializer.is_valid():
             username = serializer.data['username']
             password = serializer.data['password']
-
             confirm = serializer.data['confirm']
             if password == confirm:
                 user = User.objects.create_user(username=username, password=password)
@@ -95,7 +94,7 @@ def get_user_id(request):
 
 @api_view()
 def get_users(reqest, username):
-    players = Player.objects.filter(user__username__contains=username)
+    players = Player.objects.filter(user__username__contains=username)[:5]
     return Response(PlayerSerializer(players, many=True).data)
 
 
@@ -123,3 +122,19 @@ def get_sessions(request, id):
     sessions = sessions1.union(sessions2, sessions3, sessions4).order_by('-date')
     serializer = SessionSerializer(sessions, many=True)
     return Response(serializer.data)
+
+@api_view()
+def get_id(request, username):
+    user = User.objects.get(username=username)
+    player = Player.objects.get(user=user)
+    return Response(player.id)
+
+@api_view(['POST'])
+def send_session(request):
+    serializer = SessionSerializer(data=request.data)
+    if serializer.is_valid():
+        session = Session(name=serializer.data['name'], result=serializer.data['result'], length=serializer.data['length'], player1=serializer.data['player1'], player2=serializer.data['player2'], player3=serializer.data['player3'], player4=serializer.data['player4'])
+        session.save()
+        return Response('ok')
+    else:
+        return Response('error')
