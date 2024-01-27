@@ -1,3 +1,4 @@
+import django.utils.timezone
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -135,6 +136,22 @@ def send_session(request):
     if serializer.is_valid():
         session = Session(name=serializer.data['name'], result=serializer.data['result'], length=serializer.data['length'], player1=serializer.data['player1'], player2=serializer.data['player2'], player3=serializer.data['player3'], player4=serializer.data['player4'])
         session.save()
+        player1 = Player.objects.get(id = int(serializer.data['player1']))
+        player2 = Player.objects.get(id=int(serializer.data['player2']))
+        player3 = Player.objects.get(id=int(serializer.data['player3']))
+        player4 = Player.objects.get(id=int(serializer.data['player4']))
+        player1.gameCount += 1
+        player2.gameCount += 1
+        player3.gameCount += 1
+        player4.gameCount += 1
+        player1.last_online = django.utils.timezone.now()
+        player2.last_online = django.utils.timezone.now()
+        player3.last_online = django.utils.timezone.now()
+        player4.last_online = django.utils.timezone.now()
+        player1.save()
+        player2.save()
+        player3.save()
+        player4.save()
         return Response('ok')
     else:
         return Response('error')
